@@ -1,3 +1,6 @@
+drop table if exists usuarios;
+drop table if exists poltronas;
+
 CREATE TABLE usuarios (
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(100) NOT NULL UNIQUE,         
