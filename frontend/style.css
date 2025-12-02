@@ -26,7 +26,7 @@ h1 {
     flex-direction: column;
     align-items: center;
     width: 90%;
-    max-width: 600px; /* Largura máxima para centralizar o mapa */
+    max-width: 600px;
 }
 
 /*
@@ -51,19 +51,15 @@ Estilo da Tela de Cinema
 Layout de Grade (Batalha Naval)
 ====================================
 */
-
-/* Container Principal para o Grid e Rótulos */
 .grid-container {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* Rótulos das Colunas (Números 1-8) */
 .col-labels {
     display: grid;
-    /* Coluna vazia para alinhar com o rótulo da fila + 8 colunas de poltronas */
-    grid-template-columns: 35px repeat(8, 35px); 
+    grid-template-columns: 35px repeat(8, 35px);
     gap: 0 5px;
     margin-bottom: 5px;
 }
@@ -72,19 +68,15 @@ Layout de Grade (Batalha Naval)
     text-align: center;
     font-weight: bold;
     color: #555;
-    padding: 0;
-    line-height: 35px; /* Altura da poltrona para alinhamento */
+    line-height: 35px;
 }
 
-/* Onde ficam as poltronas e rótulos de fila (Letras A-D) */
 .seat-grid {
     display: grid;
-    /* 1 coluna para o rótulo da fila + 8 colunas para as poltronas */
-    grid-template-columns: 35px repeat(8, 35px); 
-    gap: 10px 5px; /* Espaçamento entre as filas e colunas de poltronas */
+    grid-template-columns: 35px repeat(8, 35px);
+    gap: 10px 5px;
 }
 
-/* Rótulo das Filas (Letras A-D) */
 .row-label {
     font-weight: bold;
     color: #555;
@@ -98,43 +90,40 @@ Layout de Grade (Batalha Naval)
 Estilo da Poltrona (Assento)
 ====================================
 */
+/* Assento base */
 .seat {
-    /* Ajustado para caber o formato Batalha Naval (ex: C8) */
     width: 35px;
     height: 35px;
     border-radius: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 11px;
-    font-weight: bold;
+    font-size: 0;
     cursor: pointer;
-    border: 1px solid #ccc;
-    transition: background-color 0.2s, transform 0.2s;
-    user-select: none; /* Evita que o texto seja selecionado ao clicar */
+    border: none;
+    user-select: none;
+
+    background-image: url("assento-de-cinema.png");
+    background-size: 70%;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
+/* Livre (verde) */
 .seat.free {
-    background-color: #e0e0e0;
+    background-color: #4CAF50;
 }
 
-.seat.free:hover {
-    background-color: #c0c0c0;
-    transform: scale(1.05);
-}
-
+/* Selecionada (verde escuro) */
 .seat.selected {
-    background-color: #4CAF50; /* Verde - Poltrona temporariamente selecionada */
-    color: white;
-    transform: scale(1.05);
-    border-color: #388E3C;
+    background-color: #2E7D32;
+    transform: scale(1.1);
 }
 
+/* Ocupada (vermelho) */
 .seat.occupied {
-    background-color: #FF6347; /* Vermelho - Poltrona ocupada/comprada */
-    color: white;
+    background-color: #D32F2F;
     cursor: not-allowed;
-    opacity: 0.6;
 }
 
 /*
@@ -168,7 +157,7 @@ Barra de Informações e Contador
     height: 15px;
     cursor: default;
     border: none;
-    font-size: 0; /* Esconde o texto da coordenada na legenda */
+    font-size: 0;
 }
 
 .counter {
@@ -179,23 +168,23 @@ Barra de Informações e Contador
 
 /*
 ====================================
-Modal (Caixa de Diálogo)
+Modal
 ====================================
 */
 .modal {
-    display: none; 
-    position: fixed; 
-    z-index: 1000; /* Garante que fique acima de tudo */
+    display: none;
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.6); /* Fundo mais escuro para destaque */
+    background-color: rgba(0,0,0,0.6);
 }
 
 .modal-content {
     background-color: #fefefe;
-    margin: 15% auto; 
+    margin: 15% auto;
     padding: 30px;
     border: 1px solid #888;
     width: 90%;
@@ -236,7 +225,7 @@ Modal (Caixa de Diálogo)
 }
 
 .btn.cancel {
-    background-color: #f44336; 
+    background-color: #f44336;
     color: white;
 }
 
@@ -245,7 +234,7 @@ Modal (Caixa de Diálogo)
 }
 
 .btn.buy {
-    background-color: #008CBA; 
+    background-color: #008CBA;
     color: white;
 }
 
@@ -253,7 +242,6 @@ Modal (Caixa de Diálogo)
     background-color: #005f7c;
 }
 
-/* Animação para o Modal */
 @keyframes fadeIn {
     from {opacity: 0}
     to {opacity: 1}
