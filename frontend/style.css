@@ -1,0 +1,260 @@
+/*
+====================================
+Estilos Globais e Layout Principal
+====================================
+*/
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f4f4f9;
+    padding: 20px;
+    margin: 0;
+}
+
+h1 {
+    color: #333;
+}
+
+.container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    max-width: 600px; /* Largura máxima para centralizar o mapa */
+}
+
+/*
+====================================
+Estilo da Tela de Cinema
+====================================
+*/
+.cinema-screen {
+    background-color: #000;
+    color: #fff;
+    padding: 10px 0;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 30px;
+    border-radius: 5px;
+    font-weight: bold;
+    letter-spacing: 5px;
+}
+
+/*
+====================================
+Layout de Grade (Batalha Naval)
+====================================
+*/
+
+/* Container Principal para o Grid e Rótulos */
+.grid-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Rótulos das Colunas (Números 1-8) */
+.col-labels {
+    display: grid;
+    /* Coluna vazia para alinhar com o rótulo da fila + 8 colunas de poltronas */
+    grid-template-columns: 35px repeat(8, 35px); 
+    gap: 0 5px;
+    margin-bottom: 5px;
+}
+
+.col-label-item {
+    text-align: center;
+    font-weight: bold;
+    color: #555;
+    padding: 0;
+    line-height: 35px; /* Altura da poltrona para alinhamento */
+}
+
+/* Onde ficam as poltronas e rótulos de fila (Letras A-D) */
+.seat-grid {
+    display: grid;
+    /* 1 coluna para o rótulo da fila + 8 colunas para as poltronas */
+    grid-template-columns: 35px repeat(8, 35px); 
+    gap: 10px 5px; /* Espaçamento entre as filas e colunas de poltronas */
+}
+
+/* Rótulo das Filas (Letras A-D) */
+.row-label {
+    font-weight: bold;
+    color: #555;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/*
+====================================
+Estilo da Poltrona (Assento)
+====================================
+*/
+.seat {
+    /* Ajustado para caber o formato Batalha Naval (ex: C8) */
+    width: 35px;
+    height: 35px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    transition: background-color 0.2s, transform 0.2s;
+    user-select: none; /* Evita que o texto seja selecionado ao clicar */
+}
+
+.seat.free {
+    background-color: #e0e0e0;
+}
+
+.seat.free:hover {
+    background-color: #c0c0c0;
+    transform: scale(1.05);
+}
+
+.seat.selected {
+    background-color: #4CAF50; /* Verde - Poltrona temporariamente selecionada */
+    color: white;
+    transform: scale(1.05);
+    border-color: #388E3C;
+}
+
+.seat.occupied {
+    background-color: #FF6347; /* Vermelho - Poltrona ocupada/comprada */
+    color: white;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/*
+====================================
+Barra de Informações e Contador
+====================================
+*/
+.info-bar {
+    width: 100%;
+    background-color: #eee;
+    padding: 15px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    margin-top: 25px;
+}
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    align-items: center;
+    font-size: 14px;
+}
+
+.legend .seat {
+    width: 15px;
+    height: 15px;
+    cursor: default;
+    border: none;
+    font-size: 0; /* Esconde o texto da coordenada na legenda */
+}
+
+.counter {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+/*
+====================================
+Modal (Caixa de Diálogo)
+====================================
+*/
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; /* Garante que fique acima de tudo */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6); /* Fundo mais escuro para destaque */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; 
+    padding: 30px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 350px;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    position: relative;
+    animation: fadeIn 0.3s;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+.modal-content p {
+    font-size: 18px;
+    font-weight: bold;
+    color: #008CBA;
+}
+
+.modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    min-width: 120px;
+}
+
+.btn.cancel {
+    background-color: #f44336; 
+    color: white;
+}
+
+.btn.cancel:hover {
+    background-color: #d32f2f;
+}
+
+.btn.buy {
+    background-color: #008CBA; 
+    color: white;
+}
+
+.btn.buy:hover {
+    background-color: #005f7c;
+}
+
+/* Animação para o Modal */
+@keyframes fadeIn {
+    from {opacity: 0}
+    to {opacity: 1}
+}

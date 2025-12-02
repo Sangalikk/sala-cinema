@@ -1,13 +1,48 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <link rel="stylesheet" href="style.css">
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sala de Cinema</title>
+    <title>Reserva de Poltronas</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <h1>Mapa da Sala (Batalha Naval 4x8)</h1>
+
+    <div class="container">
+        <div class="cinema-screen">TELA</div>
+        
+        <div class="grid-container">
+            <div id="col-labels" class="col-labels"></div>
+            
+            <div id="seat-grid" class="seat-grid">
+                </div>
+        </div>
+
+        <div class="info-bar">
+            <div class="legend">
+                <span class="seat free"></span> Livre
+                <span class="seat selected"></span> Selecionada
+                <span class="seat occupied"></span> Ocupada (Indisponível)
+            </div>
+            <div class="counter">
+                Contador: <span id="seat-counter">0/32</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-box" class="modal">
+        <div class="modal-content">
+            <h2>Poltrona Selecionada</h2>
+            <p id="modal-details"></p>
+            <div class="modal-actions">
+                <button id="cancel-btn" class="btn cancel">Cancelar Seleção</button>
+                <button id="buy-btn" class="btn buy">Comprar / Ocupar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
