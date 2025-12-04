@@ -7,8 +7,6 @@ class Rotas{
 
     function get($url, $action, $protected = false){$this->add('GET', $url, $action, $protected);}
     function post($url, $action, $protected = false){$this->add('POST', $url, $action, $protected);}
-    function put($url, $action, $protected = false){$this->add('PUT', $url, $action, $protected);}
-    function delete($url, $action, $protected = false){$this->add('DELETE', $url, $action, $protected);}
     function add($method, $url, $action, $protected = false){$this->rotas[] = compact('method', 'url', 'action', 'protected');}
     function execute(){
         $urlBase = 'salaCinema/sala-cinema/backend/';
