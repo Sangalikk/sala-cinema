@@ -1,8 +1,5 @@
 const url = 'http://localhost/salaCinema/sala-cinema/backend';
 
-// =============================
-// 1. VERIFICA LOGIN
-// =============================
 const token = localStorage.getItem("Authorization");
 const userId = localStorage.getItem("user_id");
 
@@ -11,9 +8,6 @@ if (!token || !userId) {
     window.location.href = "login.html";
 }
 
-// =============================
-// 2. ELEMENTOS DO DOM
-// =============================
 const seatGrid = document.getElementById('seat-grid');
 const colLabelsContainer = document.getElementById('col-labels');
 const seatCounter = document.getElementById('seat-counter');
@@ -29,14 +23,12 @@ const ROWS = ['A', 'B', 'C', 'D'];
 const COLS = 8;
 const TOTAL_SEATS = ROWS.length * COLS;
 
-// =============================
-// 3. BUSCA AS POLTRONAS DO BANCO
-// =============================
+
 async function loadSeats() {
     try {
         const response = await fetch(`${url}/poltronas`);
         seatsData = await response.json();
-
+        
         renderSeatGrid();
     } catch (err) {
         console.error("Erro ao carregar poltronas:", err);
@@ -44,14 +36,10 @@ async function loadSeats() {
     }
 }
 
-// =============================
-// 4. GERA AS POLTRONAS NA TELA
-// =============================
 function renderSeatGrid() {
     seatGrid.innerHTML = '';
     colLabelsContainer.innerHTML = '';
 
-    // topo dos números
     const emptySpan = document.createElement('span');
     colLabelsContainer.appendChild(emptySpan);
 
@@ -65,7 +53,6 @@ function renderSeatGrid() {
     // gerar grid
     for (const row of ROWS) {
 
-        // rótulo da fila (letra)
         const rowLabel = document.createElement('div');
         rowLabel.classList.add('row-label');
         rowLabel.textContent = row;
@@ -95,9 +82,6 @@ function renderSeatGrid() {
     updateCounter();
 }
 
-// =============================
-// 5. SELECIONA POLTRONA
-// =============================
 function handleSeatClick(e) {
     const seatElement = e.target;
     const seatId = seatElement.dataset.id;
@@ -121,15 +105,12 @@ function handleSeatClick(e) {
     modal.style.display = 'block';
 }
 
-// =============================
-// 6. CONFIRMAR COMPRA
-// =============================
 buyBtn.addEventListener('click', async () => {
     if (!selectedSeat) return;
 
     try {
         const response = await fetch(`${url}/poltronas`, {
-            method: "POST",
+            method: "PUT",
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
@@ -157,23 +138,14 @@ buyBtn.addEventListener('click', async () => {
     }
 });
 
-// =============================
-// 7. CANCELAR MODAL
-// =============================
 cancelBtn.addEventListener('click', () => {
     selectedSeat = null;
     modal.style.display = 'none';
 });
 
-// =============================
-// 8. CONTADOR
-// =============================
 function updateCounter() {
     const occupied = seatsData.filter(s => s.usuario_id != null).length;
     seatCounter.textContent = `${occupied}/${TOTAL_SEATS}`;
 }
 
-// =============================
-// 9. INICIA A TELA
-// =============================
 loadSeats();

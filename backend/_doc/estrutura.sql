@@ -16,12 +16,3 @@ CREATE TABLE poltronas (
     UNIQUE KEY uk_fila_coluna (fila, coluna), 
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) 
 );
-
-CREATE TABLE tokens(
-    id int not null primary key auto_increment,
-    token text not null,
-    data_exp datetime not null,
-    data_cr datetime default current_timestamp,
-    user_id int not null,
-    foreign key (user_id) references usuarios(id) on delete cascade
-)

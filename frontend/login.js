@@ -16,7 +16,6 @@ async function fazerLogin(e) {
     loginMessage.style.color = '#008CBA';
 
     try {
-
         const response = await fetch(`${url}/login`, {
             method: 'POST',
             headers: {
@@ -36,14 +35,11 @@ async function fazerLogin(e) {
             return;
         }
 
-        // ================================
-        // 🔥 SALVAR TOKEN CORRETAMENTE 🔥
-        // ================================
         if (data.token && data.userId) {
 
-            // Salva **APENAS o token**, sem "Bearer"
             localStorage.setItem("Authorization", data.token);
             localStorage.setItem("user_id", data.userId);
+
 
             loginMessage.textContent = 'Login bem-sucedido!';
             loginMessage.style.color = '#4CAF50';
