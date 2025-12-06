@@ -1,7 +1,7 @@
 <?php
 
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Methods: GET, POST, PUT, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Content-Type: application/json; chatset=utf-8;");
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
@@ -10,10 +10,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 }
 require_once "lib/class.Rotas.php";
 
+$r = new Rotas();
+
+$r->get('/poltronas/{id}', "PoltronaController@getById");
+$r->get('/poltronas', "PoltronaController@getAll");
+$r->put('/poltronas', "PoltronaController@update");
+
+$r->get('/usuarios/{id}', "UsuarioController@getById");
+$r->get('/usuarios', "UsuarioController@getAll");
+
 
 $r->post('/login', "LoginController@login", false);
 
-$r->get('/login/{user_id}', 'LoginController@changeRequest', true);
 
 try{
     $a = $r->execute();

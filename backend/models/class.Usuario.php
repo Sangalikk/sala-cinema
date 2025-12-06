@@ -8,6 +8,7 @@ class Usuario implements JsonSerializable{
     function setEmail($p){$this->email = $p;}
     function setSenha($p){$this->senha = $p;}
 
+    function getId(){return $this->id;}
     function getEmail(){return $this->email;}
     function getSenha(){return $this->senha;}
 

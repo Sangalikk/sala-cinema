@@ -1,9 +1,19 @@
-// Constantes da sala
-const ROWS = ['A', 'B', 'C', 'D']; // 4 filas
-const COLS = 8; // 8 colunas
-const TOTAL_SEATS = ROWS.length * COLS;
+const url = 'http://localhost/salaCinema/sala-cinema/backend';
 
-// Elementos DOM (Mantidos)
+// =============================
+// 1. VERIFICA LOGIN
+// =============================
+const token = localStorage.getItem("Authorization");
+const userId = localStorage.getItem("user_id");
+
+if (!token || !userId) {
+    alert("Faça login para continuar.");
+    window.location.href = "login.html";
+}
+
+// =============================
+// 2. ELEMENTOS DO DOM
+// =============================
 const seatGrid = document.getElementById('seat-grid');
 const colLabelsContainer = document.getElementById('col-labels');
 const seatCounter = document.getElementById('seat-counter');
@@ -12,139 +22,158 @@ const modalDetails = document.getElementById('modal-details');
 const cancelBtn = document.getElementById('cancel-btn');
 const buyBtn = document.getElementById('buy-btn');
 
-// Variáveis de estado (Mantidas)
-let selectedSeat = null; 
-let seatsData = []; 
+let selectedSeat = null;  
+let seatsData = [];       
 
-// --- 1. Inicialização e Geração das Poltronas (NOVO) ---
+const ROWS = ['A', 'B', 'C', 'D'];
+const COLS = 8;
+const TOTAL_SEATS = ROWS.length * COLS;
 
-function generateColLabels() {
-    // Adiciona o espaçamento (gap) inicial no topo esquerdo
-    const emptySpan = document.createElement('span');
-    colLabelsContainer.appendChild(emptySpan);
+// =============================
+// 3. BUSCA AS POLTRONAS DO BANCO
+// =============================
+async function loadSeats() {
+    try {
+        const response = await fetch(`${url}/poltronas`);
+        seatsData = await response.json();
 
-    for (let col = 1; col <= COLS; col++) {
-        const label = document.createElement('div');
-        label.classList.add('col-label-item');
-        label.textContent = col; // 1, 2, 3...
-        colLabelsContainer.appendChild(label);
+        renderSeatGrid();
+    } catch (err) {
+        console.error("Erro ao carregar poltronas:", err);
+        alert("Erro ao carregar poltronas do servidor.");
     }
 }
 
-function initializeSeats() {
-    // Limpa e inicializa os dados
+// =============================
+// 4. GERA AS POLTRONAS NA TELA
+// =============================
+function renderSeatGrid() {
     seatGrid.innerHTML = '';
     colLabelsContainer.innerHTML = '';
-    seatsData = [];
-    
-    generateColLabels(); // Gera os números (1 a 8) no topo
 
-    let index = 0;
+    // topo dos números
+    const emptySpan = document.createElement('span');
+    colLabelsContainer.appendChild(emptySpan);
+
+    for (let c = 1; c <= COLS; c++) {
+        const div = document.createElement('div');
+        div.classList.add('col-label-item');
+        div.textContent = c;
+        colLabelsContainer.appendChild(div);
+    }
+
+    // gerar grid
     for (const row of ROWS) {
-        
-        // 1. Cria o RÓTULO DA FILA (Letra A, B, C, D)
+
+        // rótulo da fila (letra)
         const rowLabel = document.createElement('div');
         rowLabel.classList.add('row-label');
         rowLabel.textContent = row;
         seatGrid.appendChild(rowLabel);
 
-        // 2. Cria as 8 POLTRONAS daquela fila
         for (let col = 1; col <= COLS; col++) {
-            const seatId = `${row}${col}`; 
-            const isOccupied = index % 5 === 0; 
-            
-            seatsData.push({
-                id: seatId,
-                row: row,
-                col: col,
-                status: isOccupied ? 'occupied' : 'free' 
-            });
-
+            const seatObj = seatsData.find(s => s.fila === row && s.coluna == col);
             const seatElement = document.createElement('div');
-            seatElement.classList.add('seat', isOccupied ? 'occupied' : 'free');
-            
-            // ALTERAÇÃO: Remove o texto de dentro da poltrona
-            seatElement.textContent = ''; 
-            
-            seatElement.dataset.id = seatId;
+
+            let status = 'free';
+            if (seatObj.usuario_id != null) {
+                status = 'occupied';
+            }
+
+            seatElement.classList.add('seat', status);
+            seatElement.dataset.id = seatObj.id;
             seatElement.dataset.row = row;
             seatElement.dataset.col = col;
 
+            seatElement.textContent = ""; // sem texto
+
             seatElement.addEventListener('click', handleSeatClick);
             seatGrid.appendChild(seatElement);
-            index++;
         }
     }
+
     updateCounter();
 }
 
-// --- 2. Manipulação de Eventos (Mantida) ---
+// =============================
+// 5. SELECIONA POLTRONA
+// =============================
+function handleSeatClick(e) {
+    const seatElement = e.target;
+    const seatId = seatElement.dataset.id;
+    const seatObj = seatsData.find(s => s.id == seatId);
 
-function handleSeatClick(event) {
-    const seat = event.target;
-    const seatId = seat.dataset.id;
-    const seatData = seatsData.find(s => s.id === seatId);
-
-    if (seatData.status === 'occupied') {
-        alert("Esta poltrona já está ocupada e indisponível.");
+    if (seatObj.usuario_id != null) {
+        alert("Essa poltrona já está ocupada.");
         return;
     }
 
-    if (selectedSeat && selectedSeat.dataset.id !== seatId) {
-        const prevSeatData = seatsData.find(s => s.id === selectedSeat.dataset.id);
-        if (prevSeatData.status === 'selected') {
-            prevSeatData.status = 'free';
-            selectedSeat.classList.remove('selected');
-            selectedSeat.classList.add('free');
-        }
-    }
-    
-    seatData.status = 'selected';
-    seat.classList.remove('free');
-    seat.classList.add('selected');
-    selectedSeat = seat;
+    const userAlreadyReserved = seatsData.some(s => s.usuario_id == userId);
 
-    modalDetails.textContent = `Coordenada: ${seatData.id}`; 
+    if (userAlreadyReserved) {
+        alert("Você já reservou uma poltrona. Só é permitido 1 por usuário.");
+        return;
+    }
+
+    selectedSeat = seatObj;
+
+    modalDetails.textContent = `Poltrona: ${seatObj.fila}${seatObj.coluna}`;
     modal.style.display = 'block';
 }
 
-// --- Ações do Modal (Mantidas) ---
+// =============================
+// 6. CONFIRMAR COMPRA
+// =============================
+buyBtn.addEventListener('click', async () => {
+    if (!selectedSeat) return;
 
-buyBtn.addEventListener('click', () => {
-    if (selectedSeat) {
-        const seatId = selectedSeat.dataset.id;
-        const seatData = seatsData.find(s => s.id === seatId);
-        seatData.status = 'occupied';
-        selectedSeat.classList.remove('selected');
-        selectedSeat.classList.add('occupied');
-        selectedSeat = null; 
+    try {
+        const response = await fetch(`${url}/poltronas`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                id: selectedSeat.id,
+                user_id: userId
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        alert("Poltrona reservada com sucesso!");
+
         modal.style.display = 'none';
-        updateCounter();
+        await loadSeats(); // recarrega poltronas
+
+    } catch (err) {
+        console.error("Erro ao reservar:", err);
     }
 });
 
+// =============================
+// 7. CANCELAR MODAL
+// =============================
 cancelBtn.addEventListener('click', () => {
-    if (selectedSeat) {
-        const seatId = selectedSeat.dataset.id;
-        const seatData = seatsData.find(s => s.id === seatId);
-        seatData.status = 'free';
-        selectedSeat.classList.remove('selected');
-        selectedSeat.classList.add('free');
-        selectedSeat = null; 
-    }
+    selectedSeat = null;
     modal.style.display = 'none';
-    updateCounter();
 });
 
-// --- 3. Atualização do Contador (Mantida) ---
-
+// =============================
+// 8. CONTADOR
+// =============================
 function updateCounter() {
-    const occupiedCount = seatsData.filter(s => s.status === 'occupied').length;
-    const selectedCount = seatsData.filter(s => s.status === 'selected').length;
-    const totalOccupied = occupiedCount + selectedCount;
-
-    seatCounter.textContent = `${totalOccupied}/${TOTAL_SEATS}`;
+    const occupied = seatsData.filter(s => s.usuario_id != null).length;
+    seatCounter.textContent = `${occupied}/${TOTAL_SEATS}`;
 }
 
-// Inicializa o sistema ao carregar a página
-initializeSeats();
+// =============================
+// 9. INICIA A TELA
+// =============================
+loadSeats();

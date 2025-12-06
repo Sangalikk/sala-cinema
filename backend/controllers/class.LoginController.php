@@ -7,10 +7,11 @@ class LoginController{
 
     function login(){
         global $key;
+        
         $data = json_decode(file_get_contents('php://input'), true); 
         if(!isset($data['email']) || !isset($data['senha'])) throw new Exception('Login ou senha faltando.');
         $s = $this->getUser($data['email']);
-        if(!isset($data['email']) || !password_verify($data['senha'], $s->getSenha())) throw new Exception("Credenciais inválidas");
+        if(!isset($data['email']) || md5($data['senha']) !== $s->getSenha()) throw new Exception("Credenciais inválidas");
         $payload = [
             'iss'=> 'http://localhost',
             'iat' => time(),
@@ -28,5 +29,6 @@ class LoginController{
     }
 
     function getUser($email){return $this->dao->getUser($email);}
+
 
 }

@@ -7,8 +7,9 @@ class Rotas{
 
     function __construct(){$this->rotas = [];}
 
-    function get($url, $action, $protected = true){$this->add('GET', $url, $action, $protected, $access);}
-    function post($url, $action, $protected = true){$this->add('POST', $url, $action, $protected, $access);}
+    function get($url, $action, $protected = true){$this->add('GET', $url, $action, $protected);}
+    function post($url, $action, $protected = true){$this->add('POST', $url, $action, $protected);}
+    function put($url, $action, $protected = true){$this->add('PUT', $url, $action, $protected);}
     function add($method, $url, $action, $protected = true){$this->rotas[] = compact('method', 'url', 'action', 'protected');}
     function execute(){
         
@@ -27,7 +28,7 @@ class Rotas{
             [$controllerName, $action] =  explode('@',$rota['action']);
             require_once "controllers/class.$controllerName.php";
             $controller = new $controllerName();
-            $auth = $rota !== false? Auth::check($rota): Auth::check();
+            $auth = Auth::check();
             if($rota['protected'] && !$auth){
                 http_response_code(404);
                 echo json_encode(['error'=>"Você não está autenticado."]);

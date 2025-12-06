@@ -1,5 +1,6 @@
-drop table if exists usuarios;
+drop table if exists tokens;
 drop table if exists poltronas;
+drop table if exists usuarios;
 
 CREATE TABLE usuarios (
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -16,11 +17,11 @@ CREATE TABLE poltronas (
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) 
 );
 
-CREATE TABLE tokens{
-    id int not null auto_increment primary key,
+CREATE TABLE tokens(
+    id int not null primary key auto_increment,
     token text not null,
     data_exp datetime not null,
     data_cr datetime default current_timestamp,
     user_id int not null,
     foreign key (user_id) references usuarios(id) on delete cascade
-}
+)

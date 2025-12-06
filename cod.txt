@@ -1,0 +1,326 @@
+<?php
+require "vendor/autoload.php";
+use Firebase\JWT\JWT;
+class LoginController{
+    private $dao;
+    function __construct(){$this->dao = new LoginDAO();}
+
+    function login(){
+        global $key;
+        
+        $data = json_decode(file_get_contents('php://input'), true); 
+        if(!isset($data['email']) || !isset($data['senha'])) throw new Exception('Login ou senha faltando.');
+        $s = $this->getUser($data['email']);
+        if(!isset($data['email']) || md5($data['senha']) !== $s->getSenha()) throw new Exception("Credenciais inválidas");
+        $payload = [
+            'iss'=> 'http://localhost',
+            'iat' => time(),
+            'exp' => time() + 60 * 60 * 16,
+            'userId' => $s->getId(),
+        ];
+        
+        $jwt = JWT::encode($payload, $key, 'HS256');
+
+        return [
+            'token' => $jwt,
+            'userId' => $s->getId()
+        ];
+        
+    }
+
+    function getUser($email){return $this->dao->getUser($email);}
+
+
+}
+
+<?php
+
+class PoltronaController
+{
+    private $dao;
+
+    function __construct(){
+        $this->dao = new PoltronaDAO();
+    }
+
+    function getById($id){
+        return $this->dao->getById($id);
+    }
+    function getAll(){
+        return $this->dao->getAll();
+    }
+    function insert(){
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (json_last_error() !== JSON_ERROR_NONE)
+            throw new Exception("Json inválido");
+        
+        $u = new Poltrona();
+        $u->setFila($data['fila']);
+        $u->setColuna($data['coluna']);
+        $u->setIdUsuario($data['usuario_id']);
+
+        try {
+            return $this->dao->insert($u);
+        } catch (PDOException $e) {
+            if ($e->getCode() == '23000' && strpos($e->getMessage(), '1062') !== false){
+                throw new Exception("Registro duplicado no sistema.");
+            }
+            throw $e;
+        }
+    }
+}
+
+<?php
+
+class UsuarioController
+{
+    private $dao;
+
+    function __construct(){
+        $this->dao = new UsuarioDAO();
+    }
+
+    function getById($id){
+        return $this->dao->getById($id);
+    }
+    function getAll(){
+        return $this->dao->getAll();
+    }
+}
+
+<?php
+class LoginDAO{
+    private $pdo;
+
+    function __construct(){$this->pdo = Banco::getConexao();}
+
+    function getUser($email){
+        $sql = 'select id, email, senha from usuarios where email = :email';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['email' => $email]);
+        $stmt->setFetchMode(PDO::FETCH_CLASS, Usuario::class);
+        $result = $stmt->fetch();
+        return $result ?? [];
+    }
+
+    function storeToken($user_id, $token, $data_exp){
+        $sql = "insert into tokens values(null, :token, :data_exp, null, :user_id)";
+        $stmt = $this->pdo->prepare($sql);
+        $result = $stmt->execute([
+            'token' => $token,
+            'user_id' => $user_id,
+            'data_exp' => $data_exp
+        ]);
+        return $result? true : false;
+    }
+
+    function getValidToken($token){
+        $sql = 'select * from tokens where token = :token';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['token' => $token]);
+        return $stmt->fetch(PDO::FETCH_OBJ);
+    }
+
+    function deleteToken ($user_id){
+        $sql = "delete from tokens where user_id = :user_id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['user_id' => $user_id]);
+    }
+}
+
+<?php 
+
+class PoltronaDAO {
+    private $pdo;
+
+    function __construct(){$this->pdo = Banco::getConexao();}
+
+    function getById($id){
+        $sql = 'select * from poltronas where id = :id';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        $stmt->setFetchMode(PDO::FETCH_CLASS, Poltrona::class);
+        $poltrona = $stmt->fetch();
+
+        return $poltrona ?? [];
+    }
+    function getAll(){
+        $sql = 'select * from poltronas';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        $stmt->setFetchMode(PDO::FETCH_CLASS, Poltrona::class);
+        $poltronas = $stmt->fetchAll();
+
+        return $poltronas ?? [];
+    }
+    function insert(Poltrona $poltrona){
+        $sql = 'insert into poltronas values (:fila, :coluna, :usuario_id)';
+        $stmt = $this->pdo->prepare($sql);
+        $result = $stmt->execute([
+            'fila' => $poltrona->getFila(),
+            'coluna' => $poltrona->getColuna(),
+            'usuario_id' => $poltrona->getIdUsuario(),
+        ]);
+        if($result){
+            $id = $this->pdo->lastInsertId();
+            return $this->getById($id) ?? [];
+        }
+    }
+}
+
+<?php 
+
+class UsuarioDAO {
+    private $pdo;
+
+    function __construct() {
+        $this->pdo = Banco::getConexao();
+    }
+
+    function getById($id) {
+        $sql = 'SELECT id, email, senha FROM usuarios WHERE id = :id';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['id' => $id]);
+
+        $stmt->setFetchMode(PDO::FETCH_CLASS, Usuario::class);
+        $usuario = $stmt->fetch();
+
+        return $usuario ?: null;
+    }
+
+    function getAll() {
+        $sql = 'SELECT id, email FROM usuarios';
+        $stmt = $this->pdo->query($sql);
+
+        $stmt->setFetchMode(PDO::FETCH_CLASS, Usuario::class);
+        return $stmt->fetchAll();
+    }
+
+    function insert(Usuario $usuario) {
+
+        $sql = 'INSERT INTO usuarios (email, senha) VALUES (:email, :senha)';
+        $stmt = $this->pdo->prepare($sql);
+
+        $result = $stmt->execute([
+            'email' => $usuario->getEmail(),
+            'senha' => $usuario->getSenha()
+        ]);
+
+        if ($result) {
+            $id = $this->pdo->lastInsertId();
+            return $this->getById($id);
+        }
+
+        return null;
+    }
+}
+
+<?php
+require_once 'vendor/autoload.php';
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
+class Auth
+{
+static function check()
+{
+    global $key;
+
+    $headers = getallheaders();
+    $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? null;
+
+    if (!$authHeader) return false;
+    $parts = explode(" ", $authHeader);
+    if (count($parts) !== 2) return false;
+    $token = trim($parts[1]);
+
+    try {
+        $payload = JWT::decode($token, new Key($key, 'HS256'));
+    } catch (Exception $e) {
+        return false; 
+    }
+
+    if (!isset($payload->userId)) return false;
+    $controller = new UsuarioController();
+    $user = $controller->getById($payload->userId);
+    if (!$user) return false;
+    return true;
+}
+}
+
+<?php
+require_once 'autoload.php';
+require_once 'Auth.php';
+require_once 'config/key.php';
+class Rotas{
+    private $rotas;
+
+    function __construct(){$this->rotas = [];}
+
+    function get($url, $action, $protected = true){$this->add('GET', $url, $action, $protected);}
+    function post($url, $action, $protected = true){$this->add('POST', $url, $action, $protected);}
+    function add($method, $url, $action, $protected = true){$this->rotas[] = compact('method', 'url', 'action', 'protected');}
+    function execute(){
+        
+        $urlBase = 'salaCinema/sala-cinema/backend/';
+        $method = $_SERVER['REQUEST_METHOD'];
+        $url =  rtrim(str_ireplace($urlBase, '', $_SERVER['REQUEST_URI']),'/');
+
+        foreach($this->rotas as $rota){
+            if($method !== $rota['method']) continue;
+
+            $padrao = "@^" . preg_replace('/\{[^\}]+\}/','([^/]+)', $rota['url']) . "$@";
+
+            if(!preg_match($padrao, $url, $matches)) continue;
+            array_shift($matches);
+
+            [$controllerName, $action] =  explode('@',$rota['action']);
+            require_once "controllers/class.$controllerName.php";
+            $controller = new $controllerName();
+            $auth = Auth::check();
+            if($rota['protected'] && !$auth){
+                http_response_code(404);
+                echo json_encode(['error'=>"Você não está autenticado."]);
+                return;
+            }
+            return call_user_func_array([$controller, $action], $matches);  
+        }
+        http_response_code(404);
+        return ['error'=>"Url não encontrada"];
+    }
+}
+
+<?php
+
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+header("Content-Type: application/json; chatset=utf-8;");
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+require_once "lib/class.Rotas.php";
+
+$r = new Rotas();
+
+$r->get('/poltronas/{id}', "PoltronaController@getById");
+$r->get('/poltronas', "PoltronaController@getAll");
+$r->post('/poltronas', "PoltronaController@insert");
+
+$r->get('/usuarios/{id}', "UsuarioController@getById");
+$r->get('/usuarios', "UsuarioController@getAll");
+
+
+$r->post('/login', "LoginController@login", false);
+
+
+try{
+    $a = $r->execute();
+    echo json_encode($a);
+}
+catch(Exception $e){
+    echo json_encode([
+        'error' => $e->getMessage()
+    ]);
+}
