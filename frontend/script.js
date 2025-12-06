@@ -147,4 +147,12 @@ function updateCounter() {
     seatCounter.textContent = `${occupied}/${TOTAL_SEATS}`;
 }
 
+// logout
+const logoutBtn = document.querySelector('header button');
+logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('Authorization');
+    localStorage.removeItem('user_id');
+    window.location.href = 'login.html';
+});
+
 loadSeats();

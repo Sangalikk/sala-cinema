@@ -220,8 +220,10 @@ header {
     margin-bottom: 20px;
 }
 
-header a {
-    text-decoration: none;
+header button {
+    cursor: pointer;
+    border: none;
+    font-size: 16px;
     color: #333;
     font-weight: bold;
     padding: 10px;
@@ -230,10 +232,12 @@ header a {
     color: white;
     transition: 0.2s;
 }
-header a:hover {
+header button:hover {
+    cursor: pointer;
     background-color: #005f7c;
     scale: 1.1;
 }
-header a:active {
+header button:active {
+    cursor: pointer;
     scale: 0.9;
 }
