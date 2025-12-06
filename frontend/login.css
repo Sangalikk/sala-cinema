@@ -1,4 +1,4 @@
-        /* CSS extra para centralizar e formatar o formulário de login */
+
         .login-box {
             width: 90%;
             max-width: 350px;
@@ -24,7 +24,7 @@
             padding: 12px;
             margin-top: 20px;
             font-size: 18px;
-            background-color: #008CBA; /* Cor do botão 'Comprar' */
+            background-color: #008CBA; 
             color: white;
             cursor: pointer;
             border: none;
@@ -37,5 +37,5 @@
         #login-message {
             margin-top: 15px;
             font-weight: bold;
-            color: #f44336; /* Cor de erro */
+            color: #f44336; 
         }

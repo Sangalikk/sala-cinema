@@ -50,7 +50,6 @@ function renderSeatGrid() {
         colLabelsContainer.appendChild(div);
     }
 
-    // gerar grid
     for (const row of ROWS) {
 
         const rowLabel = document.createElement('div');
@@ -72,7 +71,7 @@ function renderSeatGrid() {
             seatElement.dataset.row = row;
             seatElement.dataset.col = col;
 
-            seatElement.textContent = ""; // sem texto
+            seatElement.textContent = ""; 
 
             seatElement.addEventListener('click', handleSeatClick);
             seatGrid.appendChild(seatElement);
@@ -131,7 +130,7 @@ buyBtn.addEventListener('click', async () => {
         alert("Poltrona reservada com sucesso!");
 
         modal.style.display = 'none';
-        await loadSeats(); // recarrega poltronas
+        await loadSeats();
 
     } catch (err) {
         console.error("Erro ao reservar:", err);

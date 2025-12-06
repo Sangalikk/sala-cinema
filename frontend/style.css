@@ -1,8 +1,4 @@
-/*
-====================================
-Estilos Globais e Layout Principal
-====================================
-*/
+
 body {
     font-family: Arial, sans-serif;
     display: flex;
@@ -29,11 +25,6 @@ h1 {
     max-width: 600px;
 }
 
-/*
-====================================
-Estilo da Tela de Cinema
-====================================
-*/
 .cinema-screen {
     background-color: #000;
     color: #fff;
@@ -46,11 +37,6 @@ Estilo da Tela de Cinema
     letter-spacing: 5px;
 }
 
-/*
-====================================
-Layout de Grade (Batalha Naval)
-====================================
-*/
 .grid-container {
     display: flex;
     flex-direction: column;
@@ -85,12 +71,6 @@ Layout de Grade (Batalha Naval)
     align-items: center;
 }
 
-/*
-====================================
-Estilo da Poltrona (Assento)
-====================================
-*/
-/* Assento base */
 .seat {
     width: 35px;
     height: 35px;
@@ -109,28 +89,19 @@ Estilo da Poltrona (Assento)
     background-repeat: no-repeat;
 }
 
-/* Livre (verde) */
 .seat.free {
     background-color: #4CAF50;
 }
-
-/* Selecionada (verde escuro) */
 .seat.selected {
     background-color: #2E7D32;
     transform: scale(1.1);
 }
 
-/* Ocupada (vermelho) */
 .seat.occupied {
     background-color: #D32F2F;
     cursor: not-allowed;
 }
 
-/*
-====================================
-Barra de Informações e Contador
-====================================
-*/
 .info-bar {
     width: 100%;
     background-color: #eee;
@@ -166,11 +137,6 @@ Barra de Informações e Contador
     color: #333;
 }
 
-/*
-====================================
-Modal
-====================================
-*/
 .modal {
     display: none;
     position: fixed;
@@ -245,4 +211,29 @@ Modal
 @keyframes fadeIn {
     from {opacity: 0}
     to {opacity: 1}
+}
+
+header {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+header a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #008CBA;
+    color: white;
+    transition: 0.2s;
+}
+header a:hover {
+    background-color: #005f7c;
+    scale: 1.1;
+}
+header a:active {
+    scale: 0.9;
 }
